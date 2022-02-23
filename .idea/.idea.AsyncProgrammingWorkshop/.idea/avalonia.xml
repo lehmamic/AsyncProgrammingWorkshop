@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="Recipes/App.axaml" value="Recipes/Recipes.csproj" />
+        <entry key="Recipes/Views/MainWindow.axaml" value="Recipes/Recipes.csproj" />
+        <entry key="Recipes/Views/RecipeSearch.axaml" value="Recipes/Recipes.csproj" />
+        <entry key="ToDoApp/App.axaml" value="ToDoApp/ToDoApp.csproj" />
+        <entry key="ToDoApp/Views/MainWindow.axaml" value="ToDoApp/ToDoApp.csproj" />
+        <entry key="WikiArticles/App.axaml" value="WikiArticles/WikiArticles.csproj" />
+        <entry key="WikiArticles/Views/MainWindow.axaml" value="WikiArticles/WikiArticles.csproj" />
+        <entry key="WikiArticles/Views/WikipediaSearch.axaml" value="WikiArticles/WikiArticles.csproj" />
+      </map>
+    </option>
+  </component>
+</project>
