@@ -1,13 +1,15 @@
-﻿using Raven.Client.Documents;
-using WikiArticles.Services;
+﻿using WikiArticles.Services;
+using WikiArticles.Utils;
 
 namespace WikiArticles.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        public MainWindowViewModel(IDocumentStore store)
+        public MainWindowViewModel()
         {
-            WikipediaSearch = new(new WikiService(store));
+            var wikiService = new WikiService(new ArticlesApi(), new SchedulerProvider());
+
+            WikipediaSearch = new(wikiService);
         }
 
         public WikipediaSearchViewModel WikipediaSearch { get; }

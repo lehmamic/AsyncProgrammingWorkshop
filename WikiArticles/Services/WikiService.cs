@@ -2,78 +2,82 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Raven.Client.Documents;
 using WikiArticles.Models;
+using WikiArticles.Utils;
 using Timer = System.Threading.Timer;
 
-namespace WikiArticles.Services;
-
-public class WikiService
+namespace WikiArticles.Services
 {
-    private readonly IDocumentStore _store;
-    private readonly object _lockObject = new ();
-
-    private CancellationTokenSource _searchCancellationTokenSource = new();
-
-    public EventHandler<IEnumerable<Article>>? SearchResultChanged;
-
-    public WikiService(IDocumentStore store)
+    public class WikiService
     {
-        _store = store;
-    }
+        private readonly IArticlesApi _api;
+        private readonly ISchedulerProvider _schedulerProvider;
+        private readonly object _lockObject = new ();
 
-    public async Task AddArticle(Article article)
-    {
-        using var session = _store.OpenAsyncSession();
-        await session.StoreAsync(article);
-        await session.SaveChangesAsync();
-    }
+        private CancellationTokenSource _searchCancellationTokenSource = new();
 
-    public async Task SearchAsync(string searchTerm)
-    {
-        var cancellationTokenSource = CancelPendingSearchRequests();
+        public EventHandler<IEnumerable<Article>>? SearchResultChanged;
 
-        await Task.Delay(TimeSpan.FromSeconds(1), cancellationTokenSource.Token);
-
-        await SearchAndPollForNewArticles(searchTerm, cancellationTokenSource.Token);
-    }
-
-    private CancellationTokenSource CancelPendingSearchRequests()
-    {
-        lock (_lockObject)
+        public WikiService(IArticlesApi api, ISchedulerProvider schedulerProvider)
         {
-            _searchCancellationTokenSource.Cancel();
-            _searchCancellationTokenSource.Dispose();
-
-            _searchCancellationTokenSource = new();
-
-            return _searchCancellationTokenSource;
+            _api = api;
+            _schedulerProvider = schedulerProvider;
         }
-    }
 
-    private async Task SearchAndPollForNewArticles(string searchTerm, CancellationToken cancellationToken = default)
-    {
-        var t = new Timer(
-            async _ =>
-            {
-                var articles = await SearchArticleAsync(searchTerm, cancellationToken);
-                SearchResultChanged?.Invoke(this, articles);
-            },
-            null,
-            TimeSpan.Zero,
-            TimeSpan.FromSeconds(1));
-
-        cancellationToken.Register(() =>
+        public async Task AddArticle(Article article)
         {
-            t.Dispose();
-        });
-    }
+            await _api.AddArticleAsync(article);
+        }
 
-    private async Task<IEnumerable<Article>> SearchArticleAsync(string searchTerm, CancellationToken cancellationToken = default)
-    {
-        using var session = _store.OpenAsyncSession();
-        return await session.Query<Article>()
-            .Search(a => a.Title, string.IsNullOrEmpty(searchTerm) ? searchTerm : $"*{searchTerm}*")
-            .ToListAsync(cancellationToken);
+        public async Task SearchAsync(string searchTerm)
+        {
+            var cancellationTokenSource = CancelPendingSearchRequests();
+
+            await Task.Delay(TimeSpan.FromSeconds(1), cancellationTokenSource.Token);
+
+            await SearchAndPollForNewArticles(searchTerm, cancellationTokenSource.Token);
+        }
+
+        public IObservable<IEnumerable<Article>> Search(IObservable<string> searchTermStream)
+        {
+            throw new NotImplementedException();
+        }
+
+        private CancellationTokenSource CancelPendingSearchRequests()
+        {
+            lock (_lockObject)
+            {
+                _searchCancellationTokenSource.Cancel();
+                _searchCancellationTokenSource.Dispose();
+
+                _searchCancellationTokenSource = new();
+
+                return _searchCancellationTokenSource;
+            }
+        }
+
+        private async Task SearchAndPollForNewArticles(string searchTerm, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(searchTerm))
+            {
+                SearchResultChanged?.Invoke(this, Array.Empty<Article>());
+                return;
+            }
+
+            var t = new Timer(
+                async _ =>
+                {
+                    var articles = await _api.SearchArticlesAsync(searchTerm, cancellationToken);
+                    SearchResultChanged?.Invoke(this, articles);
+                },
+                null,
+                TimeSpan.Zero,
+                TimeSpan.FromSeconds(1));
+
+            cancellationToken.Register(() =>
+            {
+                t.Dispose();
+            });
+        }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using System;
 using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.ReactiveUI;
-using Raven.Embedded;
 
 namespace WikiArticles
 {
@@ -14,12 +12,6 @@ namespace WikiArticles
         [STAThread]
         public static void Main(string[] args)
         {
-            EmbeddedServer.Instance.StartServer(new ServerOptions
-            {
-                DataDirectory = "./data",
-                ServerUrl = "http://127.0.0.1:8080"
-            });
-
             BuildAvaloniaApp()
                 .StartWithClassicDesktopLifetime(args);
         }
