@@ -21,7 +21,7 @@ public class ArticlesApi : IArticlesApi
     public async Task<IEnumerable<Article>> SearchArticlesAsync(string searchTerm, CancellationToken cancellationToken = default)
     {
         return await _context.Articles
-            .Where(a =>  a.Title.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase))
+            .Where(a => searchTerm != "" && a.Title.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase))
             .ToListAsync(cancellationToken);
     }
 
