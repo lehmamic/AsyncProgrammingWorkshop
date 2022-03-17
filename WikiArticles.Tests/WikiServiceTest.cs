@@ -21,7 +21,7 @@ public class WikiServiceTest
     {
         // arrange
         _mocker.GetMock<ISchedulerProvider>()
-            .Setup(s => s.CreateTime(It.IsAny<TimeSpan>()))
+            .Setup(s => s.CreateTime(TimeSpan.FromMilliseconds(400)))
             .Returns(() => _scheduler.CreateTime("---|"));
 
         _mocker.GetMock<ISchedulerProvider>()
