@@ -28,7 +28,7 @@ namespace WikiArticles.ViewModels
                _service.SearchResultChanged += OnSearchResultChanged;
 
                this.WhenAnyValue(x => x.SearchTerm)
-                    .Subscribe( term => _ = _service.SearchAsync(term));
+                    .Subscribe( term => _searchTermStream.OnNext(term));
 
                _service.Search(_searchTermStream)
                     .ObserveOn(RxApp.MainThreadScheduler) // make sure we handle it in the UI thread
@@ -37,6 +37,18 @@ namespace WikiArticles.ViewModels
                          Articles.Clear();
                          Articles.AddRange(articles);
                     });
+
+               // We could do it directly without a Subject
+               /*
+               var termStream = this.WhenAnyValue(x => x.SearchTerm);
+               _service.Search(termStream)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(articles =>
+                    {
+                         Articles.Clear();
+                         Articles.AddRange(articles);
+                    });
+               */
           }
 
           public string ArticleName

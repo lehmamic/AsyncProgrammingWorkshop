@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WikiArticles.Models;
@@ -40,7 +42,13 @@ namespace WikiArticles.Services
 
         public IObservable<IEnumerable<Article>> Search(IObservable<string> searchTermStream)
         {
-            throw new NotImplementedException();
+            return searchTermStream
+                .Do(term => Console.WriteLine($"Before throttling: {term}"))
+                .Throttle(_schedulerProvider.CreateTime(TimeSpan.FromMilliseconds(400)), _schedulerProvider.Scheduler)
+                .Do(term => Console.WriteLine($"After throttling: {term}"))
+                .Select(term => _api.SearchArticles(term))
+                .Switch()
+                .Do(articles => Console.WriteLine($"Result count: {articles.Count()}"));
         }
 
         private CancellationTokenSource CancelPendingSearchRequests()
