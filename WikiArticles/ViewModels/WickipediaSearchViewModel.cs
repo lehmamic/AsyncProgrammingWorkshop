@@ -31,6 +31,7 @@ namespace WikiArticles.ViewModels
                     .Subscribe( term => _ = _service.SearchAsync(term));
 
                _service.Search(_searchTermStream)
+                    .ObserveOn(RxApp.MainThreadScheduler) // make sure we handle it in the UI thread
                     .Subscribe(term =>
                     {
                          // TODO
