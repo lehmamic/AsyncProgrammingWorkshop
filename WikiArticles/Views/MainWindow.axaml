@@ -7,8 +7,23 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="WikiArticles.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Width="300" Height="500"
-        Padding="12"
+        Width="500" Height="800"
         Title="WikiArticles"
-        Content="{Binding WikipediaSearch}">
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowStartupLocation="CenterScreen">
+        <Panel>
+                <ExperimentalAcrylicBorder IsHitTestVisible="False">
+                        <ExperimentalAcrylicBorder.Material>
+                                <ExperimentalAcrylicMaterial
+                                        BackgroundSource="Digger"
+                                        TintColor="Black"
+                                        TintOpacity="1"
+                                        MaterialOpacity="0.65" />
+                        </ExperimentalAcrylicBorder.Material>
+                </ExperimentalAcrylicBorder>
+
+                <views:WikipediaSearchView Margin="40" DataContext="{Binding WikipediaSearch}"></views:WikipediaSearchView>
+        </Panel>
 </Window>
