@@ -15,9 +15,9 @@ public class WikiServiceTest
 {
     private readonly AutoMocker _mocker = new();
     private readonly MarbleScheduler _scheduler = new();
-    
+
     [Fact]
-    public void Test1()
+    public void GivenSearchTermTypingSequence_WhenSearchingForArticles_ReturnsArticlesAfterThrottling()
     {
         // arrange
         _mocker.GetMock<ISchedulerProvider>()
@@ -49,8 +49,9 @@ public class WikiServiceTest
 
         // assert
         
-        // --(a skipped)(b skipped)(c) --- (throttled) ---(result) 
+        // -- (ab skipped) (c-- throttled) (--result) 
         _scheduler.ExpectObservable(actual)
             .ToBe("---------a", new { a = resultingArticles });
+        _scheduler.Flush();
     }
 }
