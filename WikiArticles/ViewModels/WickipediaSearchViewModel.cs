@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using DynamicData;
@@ -15,6 +16,8 @@ namespace WikiArticles.ViewModels
      public class WikipediaSearchViewModel : ViewModelBase
      {
           private readonly WikiService _service;
+          private readonly Subject<string> _searchTermStream = new Subject<string>();
+
           private string _searchTerm = string.Empty;
           private string _articleName = string.Empty;
 
@@ -26,6 +29,12 @@ namespace WikiArticles.ViewModels
 
                this.WhenAnyValue(x => x.SearchTerm)
                     .Subscribe( term => _ = _service.SearchAsync(term));
+
+               _service.Search(_searchTermStream)
+                    .Subscribe(term =>
+                    {
+                         // TODO
+                    });
           }
 
           public string ArticleName
