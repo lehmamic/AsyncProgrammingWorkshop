@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using WikiArticles.Models;
 using WikiArticles.Utils;
-using Timer = System.Threading.Timer;
 
 namespace WikiArticles.Services
 {
@@ -14,11 +11,14 @@ namespace WikiArticles.Services
     {
         private readonly IArticlesApi _api;
         private readonly ISchedulerProvider _schedulerProvider;
+        
+        /*
         private readonly object _lockObject = new ();
 
         private CancellationTokenSource _searchCancellationTokenSource = new();
 
         public EventHandler<IEnumerable<Article>>? SearchResultChanged;
+        */
 
         public WikiService(IArticlesApi api, ISchedulerProvider schedulerProvider)
         {
@@ -30,7 +30,7 @@ namespace WikiArticles.Services
         {
             await _api.AddArticleAsync(article);
         }
-
+/*
         public async Task SearchAsync(string searchTerm)
         {
             var cancellationTokenSource = CancelPendingSearchRequests();
@@ -39,6 +39,7 @@ namespace WikiArticles.Services
 
             await SearchAndPollForNewArticles(searchTerm, cancellationTokenSource.Token);
         }
+        */
 
         public IObservable<IEnumerable<Article>> Search(IObservable<string> searchTermStream)
         {
@@ -48,6 +49,7 @@ namespace WikiArticles.Services
                 .Switch();
         }
 
+        /*
         private CancellationTokenSource CancelPendingSearchRequests()
         {
             lock (_lockObject)
@@ -84,5 +86,6 @@ namespace WikiArticles.Services
                 t.Dispose();
             });
         }
+        */
     }
 }

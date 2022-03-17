@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Threading.Tasks;
-using Avalonia.Threading;
 using DynamicData;
 using ReactiveUI;
 using WikiArticles.Models;
@@ -25,7 +21,9 @@ namespace WikiArticles.ViewModels
           {
                _service = service;
 
+               /*
                _service.SearchResultChanged += OnSearchResultChanged;
+               */
 
                this.WhenAnyValue(x => x.SearchTerm)
                     .Subscribe( term => _searchTermStream.OnNext(term));
@@ -74,6 +72,7 @@ namespace WikiArticles.ViewModels
                ArticleName = string.Empty;
           }
 
+          /*
           private async void OnSearchResultChanged(object? sender, IEnumerable<Article> e)
           {
                await SetSearchResultsAsync(e);
@@ -87,5 +86,6 @@ namespace WikiArticles.ViewModels
                     Articles.AddRange(articles);
                });
           }
+          */
      }
 }
