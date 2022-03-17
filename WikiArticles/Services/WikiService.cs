@@ -43,12 +43,9 @@ namespace WikiArticles.Services
         public IObservable<IEnumerable<Article>> Search(IObservable<string> searchTermStream)
         {
             return searchTermStream
-                .Do(term => Console.WriteLine($"Before throttling: {term}"))
                 .Throttle(_schedulerProvider.CreateTime(TimeSpan.FromMilliseconds(400)), _schedulerProvider.Scheduler)
-                .Do(term => Console.WriteLine($"After throttling: {term}"))
                 .Select(term => _api.SearchArticles(term))
-                .Switch()
-                .Do(articles => Console.WriteLine($"Result count: {articles.Count()}"));
+                .Switch();
         }
 
         private CancellationTokenSource CancelPendingSearchRequests()

@@ -22,8 +22,11 @@ public class ArticlesApi : IArticlesApi
     
     public async Task<IEnumerable<Article>> SearchArticlesAsync(string searchTerm, CancellationToken cancellationToken = default)
     {
+        var trimmedTerm = string.IsNullOrEmpty(searchTerm) ? string.Empty : searchTerm.Trim();
+
+        // the behavior of the inmemory db string comparison is weird "te" matches with "tante", but it does not matter for the workshop
         return await _context.Articles
-            .Where(a => searchTerm != "" && a.Title.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase))
+            .Where(a => trimmedTerm != "" && a.Title.Contains(trimmedTerm, StringComparison.CurrentCultureIgnoreCase))
             .ToListAsync(cancellationToken);
     }
 
