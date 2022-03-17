@@ -44,7 +44,9 @@ namespace WikiArticles.Services
         {
             return searchTermStream
                 .Throttle(_schedulerProvider.CreateTime(TimeSpan.FromMilliseconds(400)), _schedulerProvider.Scheduler)
-                .Select(term => _api.SearchArticles(term))
+                .Select(term => Observable.Interval(_schedulerProvider.CreateTime(TimeSpan.FromMilliseconds(1000)), _schedulerProvider.Scheduler)
+                    .Select(_ => _api.SearchArticles(term))
+                    .Switch())
                 .Switch();
         }
 

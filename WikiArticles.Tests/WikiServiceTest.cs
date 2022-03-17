@@ -23,6 +23,10 @@ public class WikiServiceTest
         _mocker.GetMock<ISchedulerProvider>()
             .Setup(s => s.CreateTime(TimeSpan.FromMilliseconds(400)))
             .Returns(() => _scheduler.CreateTime("---|"));
+        
+        _mocker.GetMock<ISchedulerProvider>()
+            .Setup(s => s.CreateTime(TimeSpan.FromMilliseconds(1000)))
+            .Returns(() => _scheduler.CreateTime("---|"));
 
         _mocker.GetMock<ISchedulerProvider>()
             .SetupGet(s => s.Scheduler)
@@ -45,13 +49,13 @@ public class WikiServiceTest
                 c = "tes",
             });
 
-        var actual = service.Search(searchTermStream);
+        var actual = service.Search(searchTermStream)
+            .Take(2);
 
         // assert
         
-        // -- (ab skipped) (c-- throttled) (--result) 
         _scheduler.ExpectObservable(actual)
-            .ToBe("---------a", new { a = resultingArticles });
+            .ToBe("------------a--(a|)", new { a = resultingArticles });
         _scheduler.Flush();
     }
 }
